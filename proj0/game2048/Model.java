@@ -113,6 +113,14 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
+
+        for(int c = 0; c < board.size(); c= c + 1){
+            if(processColumn(c)){
+                changed = true;
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
@@ -121,6 +129,41 @@ public class Model extends Observable {
         return changed;
     }
 
+    private boolean processColumn(int c){
+        boolean colChanged = false;
+
+        boolean []  merged = new boolean[board.size()];
+        for (int r = board.size() - 2; r >= 0; r--){ //从顶-1开始循环下来查找
+            Tile t = board.tile(c ,r );
+            if ( t !=  null){
+                int targetRow = r ;
+                while (targetRow < board.size() -1 && board.tile (c,targetRow + 1 ) == null){
+                    targetRow = targetRow + 1 ;
+                }
+                if (targetRow < board.size() -1 ){
+                    Tile nextTile = board.tile(c,targetRow +1 );
+
+                    if (nextTile.value() == t.value() && !merged[targetRow + 1]){
+                        targetRow = targetRow + 1;
+                    }
+                }
+
+                if(targetRow !=r ) {
+                    boolean isMerge = board.move(c ,targetRow ,t); //题目直接让移动上去
+                    colChanged = true;
+
+                    if (isMerge){
+                        score = score + (t.value() *2 );
+
+                        merged[targetRow] = true;
+                    }
+                }
+
+            }
+        }
+
+        return colChanged;
+    }
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
      */
@@ -138,6 +181,15 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for (int i= 0; i < size ;i++ ){
+            for (int j = 0; j < size; j++){
+                if (b.tile(i,j) == null){
+                    return true;
+                }
+            }
+
+        }
         return false;
     }
 
@@ -147,7 +199,16 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+
+        for (int i = 0; i <size; i++){
+            for(int j = 0; j < size; j++){
+
+                if( b.tile(i,j) != null && b.tile(i,j).value() == MAX_PIECE ) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +220,33 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b)){
+            return true;
+        }
+
+        int size = b.size();
+        for (int c = 0;c < size ;c++){
+            for(int r = 0;r < size ;r++){
+                int currentVal = b.tile(c,r).value();
+
+                if (c< size-1){ //安全索引是size-1
+                    int rightVal  = b.tile(c +1 ,r).value();
+                    if (currentVal == rightVal){
+                        return true;
+                    }
+                }
+
+                if (r <size-1){
+                    int upVal = b.tile(c,r+1).value();
+                    if (currentVal == upVal){
+                        return true;
+                    }
+                }
+
+            }
+        }
+
+
         return false;
     }
 
