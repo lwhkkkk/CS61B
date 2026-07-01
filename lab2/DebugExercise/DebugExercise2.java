@@ -7,13 +7,12 @@ package DebugExercise;
 public class DebugExercise2 {
     /** Returns the max of a and b. Do not step into this function. */
     public static int max(int a, int b) {
-        int w = (b - a) >> 31;
-        /* If you're stepping into this function, click the
-           step out button because you're not going to learn anything. */
-        int z = ~(b - a) >> 31;
-
-        int max = b & w | a & z;
-        return max;
+        if(a > b){
+            return a;
+        }
+        else{
+            return b;
+        }
     }
 
 
@@ -63,6 +62,7 @@ public class DebugExercise2 {
         }
         return sum;
     }
+
 
     /** Returns the sum of the element-wise max of a and b.
      *  For example if a = {2, 0, 10, 14} and b = {-5, 5, 20, 30},
